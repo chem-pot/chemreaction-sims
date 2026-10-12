@@ -1,21 +1,15 @@
 {
-  "title": "화학 시뮬레이션 모음",
-  "courses": [
+  "title": "화학 반응의 세계",
+  "units": [
     {
-      "id": "hwabanse",
-      "name": "화학 반응의 세계",
-      "units": [
+      "id": "2",
+      "name": "Ⅱ. 산화·환원 반응",
+      "sims": [
         {
-          "id": "2",
-          "name": "Ⅱ. 산화·환원 반응",
-          "sims": [
-            {
-              "id": "battery",
-              "title": "전지 실험",
-              "desc": "예시 항목입니다. 관리 화면에서 고쳐 쓰세요.",
-              "path": "sims/hwabanse/u2/battery/"
-            }
-          ]
+          "id": "battery",
+          "title": "전지 실험",
+          "desc": "예시 항목입니다. 관리 화면에서 고쳐 쓰세요.",
+          "path": "sims/u2/battery/"
         }
       ]
     }
