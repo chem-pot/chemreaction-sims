@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>화학 시뮬레이션 모음</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--bg:#f5f7fa;--card:#fff;--ink:#1d232b;--sub:#5f6b7a;--line:#e1e6ec;--accent:#2f6fdb;--accent-ink:#fff;--soft:#eaf1fd;--danger:#c23b3b}
+@media (prefers-color-scheme:dark){:root{--bg:#14171c;--card:#1d2128;--ink:#e8ecf1;--sub:#9aa5b3;--line:#2c323b;--accent:#6b9cf0;--accent-ink:#0f1420;--soft:#1f2b40;--danger:#e46a6a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:900px;margin:0 auto;padding:22px 16px 70px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+header h1{font-size:1.35rem;margin:0}
+header h1 a{color:inherit;text-decoration:none}
+.crumb{font-size:.9rem;color:var(--sub);margin:6px 0 20px;min-height:1.4em}
+.crumb a{color:var(--accent);text-decoration:none}
+h2{font-size:1.15rem;margin:0 0 12px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px}
+a.card{color:inherit;text-decoration:none;transition:border-color .15s}
+a.card:hover{border-color:var(--accent)}
+.card h3{margin:0;font-size:1.05rem}
+.meta{color:var(--sub);font-size:.85rem}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+button,.btn{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 11px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+button:hover,.btn:hover{border-color:var(--accent)}
+.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.danger{color:var(--danger)}
+.sharebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--soft);border-radius:10px;padding:10px 12px;margin-bottom:16px;font-size:.88rem}
+.sharebar code{word-break:break-all;flex:1;min-width:0}
+.empty{color:var(--sub);padding:30px 0;text-align:center}
+footer{margin-top:40px;font-size:.8rem;color:var(--sub);text-align:center}
+footer a{color:var(--sub)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:20px;font-size:.88rem;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.on{opacity:1}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal.on{display:flex}
+.modal .box{background:#fff;color:#111;border-radius:14px;padding:22px;text-align:center;max-width:420px;width:100%}
+.modal .box h3{margin:0 0 12px}
+#qr{display:flex;justify-content:center;margin:8px 0 12px}
+#qr img,#qr canvas{width:min(300px,70vw)!important;height:auto!important}
+.modal .url{font-size:.78rem;word-break:break-all;color:#555;margin-bottom:12px}
+/* editor */
+.notice{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:.88rem;margin-bottom:16px}
+.toolbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.ed-block{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+.ed-unit{border-left:3px solid var(--accent);margin:10px 0 0 6px;padding:8px 0 8px 12px}
+.ed-sim{border-left:2px dashed var(--line);margin:8px 0 0 6px;padding:6px 0 6px 12px}
+.ed-line{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ed-line input,.ed-line textarea{font:inherit;font-size:.88rem;padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);min-width:0}
+.ed-line .grow{flex:1 1 200px}
+.ed-line .id{width:110px}
+.ed-line textarea{flex:1 1 100%;resize:vertical;min-height:34px}
+.lbl{font-size:.75rem;color:var(--sub)}
+.small{padding:4px 8px;font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><a href="#/" id="siteTitle">화학 시뮬레이션 모음</a></h1>
+  </header>
+  <div class="crumb" id="crumb"></div>
+  <main id="app"></main>
+  <footer><a href="#/edit">관리</a></footer>
+</div>
+<div id="toast"></div>
+<div class="modal" id="qrModal">
+  <div class="box">
+    <h3 id="qrTitle"></h3>
+    <div id="qr"></div>
+    <div class="url" id="qrUrl"></div>
+    <button id="qrClose">닫기</button>
+  </div>
+</div>
+
+<script>
+/* sims.json을 불러오지 못할 때(파일을 그냥 더블클릭해서 열었을 때 등) 쓰는 기본 데이터 */
+const FALLBACK = {
+  "title": "화학 시뮬레이션 모음",
+  "courses": [
+    {"id":"hwabanse","name":"화학 반응의 세계","units":[
+      {"id":"2","name":"Ⅱ. 산화·환원 반응","sims":[
+        {"id":"battery","title":"전지 실험","desc":"예시 항목입니다. 관리 화면에서 고쳐 쓰세요.","path":"sims/hwabanse/u2/battery/"}
+      ]}
+    ]}
+  ]
+};
+const DRAFT_KEY = 'simhub-draft-v1';
+let pub = null;      // 공개된 데이터(sims.json)
+let draft = null;    // 관리 화면에서 고치는 중인 데이터
+
+const $ = s => document.querySelector(s);
+function el(tag, attrs, ...kids){
+  const n = document.createElement(tag);
+  if(attrs) for(const [k,v] of Object.entries(attrs)){
+    if(k==='on') for(const [ev,fn] of Object.entries(v)) n.addEventListener(ev,fn);
+    else if(k==='text') n.textContent = v;
+    else if(v!==undefined && v!==null && v!==false) n.setAttribute(k, v===true?'':v);
+  }
+  for(const k of kids.flat()){ if(k==null) continue; n.append(k.nodeType?k:document.createTextNode(k)); }
+  return n;
+}
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),1600); }
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function baseUrl(){ return location.href.split('#')[0].split('?')[0]; }
+function simUrl(path){ if(!path) return '#'; if(/^https?:\/\//i.test(path)) return path; return new URL(path, baseUrl()).href; }
+function pageUrl(hash){ return baseUrl() + hash; }
+async function copy(text){
+  try{ await navigator.clipboard.writeText(text); toast('링크를 복사했어요'); }
+  catch(e){ prompt('아래 링크를 복사하세요', text); }
+}
+function showQR(title, url){
+  $('#qrTitle').textContent = title; $('#qrUrl').textContent = url;
+  const box = $('#qr'); box.innerHTML='';
+  if(window.QRCode){ new QRCode(box,{text:url,width:300,height:300,correctLevel:QRCode.CorrectLevel.M}); }
+  else box.textContent = 'QR 코드를 불러오지 못했어요.';
+  $('#qrModal').classList.add('on');
+}
+$('#qrClose').onclick = ()=>$('#qrModal').classList.remove('on');
+$('#qrModal').onclick = e=>{ if(e.target.id==='qrModal') $('#qrModal').classList.remove('on'); };
+
+function loadDraft(){ try{ const s=localStorage.getItem(DRAFT_KEY); return s?JSON.parse(s):null; }catch(e){ return null; } }
+function saveDraft(){ try{ localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); }catch(e){} }
+function clearDraft(){ try{ localStorage.removeItem(DRAFT_KEY); }catch(e){} }
+
+function crumb(parts){
+  const c = $('#crumb'); c.innerHTML='';
+  parts.forEach((p,i)=>{
+    if(i) c.append(' › ');
+    c.append(p.href ? el('a',{href:p.href,text:p.label}) : el('span',{text:p.label}));
+  });
+}
+function shareBar(label, url, title){
+  return el('div',{class:'sharebar'},
+    el('span',{text:label}), el('code',{text:url}),
+    el('button',{class:'small',on:{click:()=>copy(url)}},'링크 복사'),
+    el('button',{class:'small',on:{click:()=>showQR(title,url)}},'QR'));
+}
+
+/* ---------- 학생용 화면 ---------- */
+function viewHome(d){
+  crumb([]);
+  const app=$('#app'); app.innerHTML='';
+  if(!d.courses.length){ app.append(el('p',{class:'empty',text:'아직 등록된 과목이 없어요.'})); return; }
+  app.append(el('div',{class:'grid'}, d.courses.map(c=>{
+    const n = c.units.reduce((a,u)=>a+u.sims.length,0);
+    return el('a',{class:'card',href:`#/c/${c.id}`}, el('h3',{text:c.name}), el('div',{class:'meta',text:`${c.units.length}개 단원 · 시뮬레이션 ${n}개`}));
+  })));
+}
+function viewCourse(d,c){
+  crumb([{label:'전체',href:'#/'},{label:c.name}]);
+  const app=$('#app'); app.innerHTML='';
+  app.append(shareBar('과목 링크', pageUrl(`#/c/${c.id}`), c.name));
+  if(!c.units.length){ app.append(el('p',{class:'empty',text:'아직 등록된 단원이 없어요.'})); return; }
+  app.append(el('div',{class:'grid'}, c.units.map(u=>
+    el('a',{class:'card',href:`#/c/${c.id}/u/${u.id}`}, el('h3',{text:u.name}), el('div',{class:'meta',text:`시뮬레이션 ${u.sims.length}개`}))
+  )));
+}
+function viewUnit(d,c,u){
+  crumb([{label:'전체',href:'#/'},{label:c.name,href:`#/c/${c.id}`},{label:u.name}]);
+  const app=$('#app'); app.innerHTML='';
+  app.append(el('h2',{text:u.name}));
+  app.append(shareBar('단원 링크', pageUrl(`#/c/${c.id}/u/${u.id}`), `${c.name} ${u.name}`));
+  if(!u.sims.length){ app.append(el('p',{class:'empty',text:'아직 등록된 시뮬레이션이 없어요.'})); return; }
+  app.append(el('div',{class:'grid'}, u.sims.map(s=>{
+    const url = simUrl(s.path);
+    return el('div',{class:'card'},
+      el('h3',{text:s.title||'(제목 없음)'}),
+      s.desc ? el('div',{class:'meta',text:s.desc}) : null,
+      el('div',{class:'row'},
+        el('a',{class:'btn primary',href:url,target:'_blank',rel:'noopener'},'열기'),
+        el('button',{on:{click:()=>copy(url)}},'링크 복사'),
+        el('button',{on:{click:()=>showQR(s.title,url)}},'QR')));
+  })));
+}
+
+/* ---------- 관리 화면 ---------- */
+function newId(p){ return p + Date.now().toString(36).slice(-4); }
+function move(arr,i,d){ const j=i+d; if(j<0||j>=arr.length) return; [arr[i],arr[j]]=[arr[j],arr[i]]; saveDraft(); viewEdit(); }
+function del(arr,i,what){ if(!confirm(`이 ${what}을(를) 지울까요?`)) return; arr.splice(i,1); saveDraft(); viewEdit(); }
+function inp(obj,key,ph,cls){
+  return el('input',{class:cls||'grow',placeholder:ph,value:obj[key]||'',on:{input:e=>{obj[key]=e.target.value.trim()?e.target.value:'';saveDraft();}}});
+}
+function ctrl(arr,i,what){
+  return [el('button',{class:'small',title:'위로',on:{click:()=>move(arr,i,-1)}},'▲'),
+          el('button',{class:'small',title:'아래로',on:{click:()=>move(arr,i,1)}},'▼'),
+          el('button',{class:'small danger',title:'삭제',on:{click:()=>del(arr,i,what)}},'✕')];
+}
+function download(){
+  const blob = new Blob([JSON.stringify(draft,null,2)],{type:'application/json'});
+  const a = el('a',{href:URL.createObjectURL(blob),download:'sims.json'}); document.body.append(a); a.click(); a.remove();
+  toast('sims.json을 내려받았어요');
+}
+function viewEdit(){
+  crumb([{label:'전체',href:'#/'},{label:'관리'}]);
+  const app=$('#app'); app.innerHTML='';
+  app.append(el('div',{class:'notice'},
+    '여기서 고친 내용은 이 브라우저에만 임시 저장돼요. 다 고친 뒤 ',el('b',{text:'sims.json 내려받기'}),
+    ' → GitHub 저장소의 sims.json을 덮어 올리면 학생 화면에 반영됩니다. ',
+    el('br'),'ID는 링크 주소에 들어가니 짧은 영문/숫자로 쓰고, 한 번 공유한 뒤에는 바꾸지 않는 게 좋아요.'));
+  app.append(el('div',{class:'toolbar'},
+    el('button',{class:'primary',on:{click:download}},'sims.json 내려받기'),
+    el('button',{on:{click:()=>copy(JSON.stringify(draft,null,2))}},'JSON 복사'),
+    el('label',{class:'btn'},'JSON 불러오기',
+      el('input',{type:'file',accept:'.json,application/json',style:'display:none',on:{change:async e=>{
+        const f=e.target.files[0]; if(!f) return;
+        try{ const d=JSON.parse(await f.text()); if(!Array.isArray(d.courses)) throw 0; draft=d; saveDraft(); viewEdit(); toast('불러왔어요'); }
+        catch(err){ alert('올바른 sims.json 파일이 아니에요.'); }
+      }}})),
+    el('button',{class:'danger',on:{click:()=>{ if(confirm('고친 내용을 버리고 공개된 버전으로 되돌릴까요?')){ clearDraft(); draft=clone(pub); viewEdit(); } }}},'공개 버전으로 되돌리기')));
+
+  app.append(el('div',{class:'ed-line',style:'margin-bottom:14px'}, el('span',{class:'lbl'},'사이트 제목'), inp(draft,'title','사이트 제목')));
+
+  draft.courses.forEach((c,ci)=>{
+    const block = el('div',{class:'ed-block'},
+      el('div',{class:'ed-line'}, el('b',{text:'과목'}), inp(c,'name','과목 이름'), inp(c,'id','ID','id'), ...ctrl(draft.courses,ci,'과목')));
+    c.units.forEach((u,ui)=>{
+      const ub = el('div',{class:'ed-unit'},
+        el('div',{class:'ed-line'}, el('span',{class:'lbl'},'단원'), inp(u,'name','단원 이름'), inp(u,'id','ID','id'), ...ctrl(c.units,ui,'단원')));
+      u.sims.forEach((s,si)=>{
+        ub.append(el('div',{class:'ed-sim'},
+          el('div',{class:'ed-line'}, inp(s,'title','시뮬레이션 제목'), ...ctrl(u.sims,si,'시뮬레이션')),
+          el('div',{class:'ed-line',style:'margin-top:4px'}, inp(s,'path','경로 또는 주소 (예: sims/hwabanse/u2/battery/ 또는 https://...)'),
+            el('a',{class:'btn small',href:'#',on:{click:e=>{e.preventDefault();window.open(simUrl(s.path),'_blank');}}},'열어보기')),
+          el('div',{class:'ed-line',style:'margin-top:4px'}, el('textarea',{placeholder:'한 줄 설명 (선택)',on:{input:e=>{s.desc=e.target.value;saveDraft();}}}, s.desc||''))));
+      });
+      ub.append(el('button',{class:'small',style:'margin-top:8px',on:{click:()=>{u.sims.push({id:newId('s'),title:'',desc:'',path:''});saveDraft();viewEdit();}}},'+ 시뮬레이션 추가'));
+      block.append(ub);
+    });
+    block.append(el('button',{class:'small',style:'margin-top:10px',on:{click:()=>{c.units.push({id:String(c.units.length+1),name:'',sims:[]});saveDraft();viewEdit();}}},'+ 단원 추가'));
+    app.append(block);
+  });
+  app.append(el('button',{on:{click:()=>{draft.courses.push({id:newId('c'),name:'',units:[]});saveDraft();viewEdit();}}},'+ 과목 추가'));
+}
+
+/* ---------- 라우팅 ---------- */
+function route(){
+  const h = location.hash.replace(/^#\/?/,'').split('/').map(decodeURIComponent);
+  $('#qrModal').classList.remove('on');
+  if(h[0]==='edit'){ if(!draft) draft = loadDraft() || clone(pub); viewEdit(); window.scrollTo(0,0); return; }
+  const d = pub;
+  if(h[0]==='c' && h[1]){
+    const c = d.courses.find(x=>x.id===h[1]);
+    if(!c){ crumb([{label:'전체',href:'#/'}]); $('#app').innerHTML=''; $('#app').append(el('p',{class:'empty',text:'해당 과목을 찾을 수 없어요.'})); return; }
+    if(h[2]==='u' && h[3]){
+      const u = c.units.find(x=>x.id===h[3]);
+      if(u){ viewUnit(d,c,u); window.scrollTo(0,0); return; }
+    }
+    viewCourse(d,c); window.scrollTo(0,0); return;
+  }
+  viewHome(d);
+}
+
+(async function init(){
+  try{
+    const r = await fetch('sims.json',{cache:'no-store'});
+    if(!r.ok) throw 0;
+    pub = await r.json();
+  }catch(e){ pub = clone(FALLBACK); }
+  pub.courses = pub.courses || [];
+  pub.courses.forEach(c=>{ c.units=c.units||[]; c.units.forEach(u=>u.sims=u.sims||[]); });
+  if(pub.title){ $('#siteTitle').textContent = pub.title; document.title = pub.title; }
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
+</body>
+</html>
