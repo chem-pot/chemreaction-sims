@@ -1,27 +1,37 @@
 {
-  "title": "화학 반응의 세계",
-  "units": [
+  "title": "케미작렬",
+  "courses": [
     {
-      "id": "1",
-      "name": "Ⅰ. 산 염기 평형",
-      "sims": []
-    },
-    {
-      "id": "2",
-      "name": "Ⅱ. 산화·환원 반응",
-      "sims": [
+      "id": "hwabanse",
+      "name": "화학 반응의 세계",
+      "color": "navy",
+      "units": [
+        { "id": "1", "name": "Ⅰ. 산 염기 평형", "sims": [] },
         {
-          "id": "battery",
-          "title": "전지 실험",
-          "desc": "예시 항목입니다. 관리 화면에서 고쳐 쓰세요.",
-          "path": "sims/u2/battery/"
-        }
+          "id": "2",
+          "name": "Ⅱ. 산화·환원 반응",
+          "sims": [
+            {
+              "id": "battery",
+              "title": "전지 실험",
+              "desc": "예시 항목입니다. 관리 화면에서 고쳐 쓰세요.",
+              "path": "sims/u2/battery/"
+            }
+          ]
+        },
+        { "id": "3", "name": "Ⅲ. 탄소 화합물과 반응", "sims": [] }
       ]
     },
     {
-      "id": "3",
-      "name": "Ⅲ. 탄소 화합물과 반응",
-      "sims": []
+      "id": "mulen",
+      "name": "물질과 에너지",
+      "color": "orange",
+      "units": [
+        { "id": "1", "name": "1. 물질의 세 가지 상태", "sims": [] },
+        { "id": "2", "name": "2. 용액의 성질", "sims": [] },
+        { "id": "3", "name": "3. 화학 변화의 자발성", "sims": [] },
+        { "id": "4", "name": "4. 반응 속도", "sims": [] }
+      ]
     }
   ]
 }
