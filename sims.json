@@ -6,20 +6,58 @@
       "name": "화학 반응의 세계",
       "color": "navy",
       "units": [
-        { "id": "1", "name": "Ⅰ. 산 염기 평형", "sims": [] },
+        {
+          "id": "1",
+          "name": "Ⅰ. 산 염기 평형",
+          "sims": []
+        },
         {
           "id": "2",
           "name": "Ⅱ. 산화·환원 반응",
           "sims": [
             {
+              "id": "sppd0",
+              "title": "전지의 구조(2-2-01)",
+              "desc": "전지의 구조를 살펴볼 수 있는 시뮬레이션",
+              "path": "https://chem-pot.github.io/cell-structure"
+            },
+            {
               "id": "battery",
-              "title": "전지 실험",
-              "desc": "예시 항목입니다. 관리 화면에서 고쳐 쓰세요.",
-              "path": "sims/u2/battery/"
+              "title": "[해보기] 볼타 전지 만들기(2-2-02)",
+              "desc": "볼타 전지를 만들어 화학 전지의 원리를 알아보자.",
+              "path": "https://chem-pot.github.io/volta-cell"
+            },
+            {
+              "id": "sf31o",
+              "title": "볼타 전지와 다니엘 전지(2-2-02)",
+              "desc": "볼타 전지와 다니엘 전지 시뮬레이션",
+              "path": "https://chem-pot.github.io/voltadaniel"
+            },
+            {
+              "id": "sjzwj",
+              "title": "[해보기] 금속과 금속 염 수용액의 반응 관찰하기(2-2-02)",
+              "desc": "금속과 금속 염 수용액의 반응을 통해 산화·환원 반응에서의 금속 반응성의 상대적인 크기를 비교할 수 있다.",
+              "path": "https://chem-pot.github.io/metal-react"
+            },
+            {
+              "id": "sho9m",
+              "title": "표준 환원 전위와 전지 전위(2-2-02)",
+              "desc": "표준 환원 전위와 전지 전위",
+              "path": "https://chem-pot.github.io/galvanic-cell"
+            },
+            {
+              "id": "sve7u",
+              "title": "[해보기] 물을 전기 분해 하기(2-2-03)",
+              "desc": "물에 전기 에너지를 가했을 때 발생하는 현상을 설명할 수 있다.",
+              "path": "https://chem-pot.github.io/cr-water-electrolysis"
             }
           ]
         },
-        { "id": "3", "name": "Ⅲ. 탄소 화합물과 반응", "sims": [] }
+        {
+          "id": "3",
+          "name": "Ⅲ. 탄소 화합물과 반응",
+          "sims": []
+        }
       ]
     },
     {
@@ -27,10 +65,26 @@
       "name": "물질과 에너지",
       "color": "orange",
       "units": [
-        { "id": "1", "name": "1. 물질의 세 가지 상태", "sims": [] },
-        { "id": "2", "name": "2. 용액의 성질", "sims": [] },
-        { "id": "3", "name": "3. 화학 변화의 자발성", "sims": [] },
-        { "id": "4", "name": "4. 반응 속도", "sims": [] }
+        {
+          "id": "1",
+          "name": "1. 물질의 세 가지 상태",
+          "sims": []
+        },
+        {
+          "id": "2",
+          "name": "2. 용액의 성질",
+          "sims": []
+        },
+        {
+          "id": "3",
+          "name": "3. 화학 변화의 자발성",
+          "sims": []
+        },
+        {
+          "id": "4",
+          "name": "4. 반응 속도",
+          "sims": []
+        }
       ]
     }
   ]
